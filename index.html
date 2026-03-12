@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أسعار الأدوية - مستشفى بغداد</title>
+    <title>أسعار الأدوية</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;800&family=IBM+Plex+Sans+Arabic:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #0f172a;
-            --bg-card: #1e293b;
-            --bg-hover: #334155;
-            --accent: #14b8a6; /* Teal */
-            --accent-light: #5eead4;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #334155;
+            --bg: #121212;
+            --bg-card: #1E1E1E;
+            --accent: #00E676; /* Green */
+            --text-main: #FFFFFF;
+            --text-muted: #9E9E9E;
+            --border: #2C2C2C;
         }
 
         * {
@@ -38,222 +34,142 @@
             min-height: 100vh;
         }
 
-        /* Header Styles */
+        /* Header */
         header {
-            background: linear-gradient(180deg, rgba(20, 184, 166, 0.1) 0%, transparent 100%);
+            padding: 1.25rem 1rem;
+            text-align: center;
             border-bottom: 1px solid var(--border);
-            padding: 1rem;
+            background: var(--bg);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
         }
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .header-title {
+        h1 {
             font-family: 'Noto Kufi Arabic', sans-serif;
-            font-weight: 700;
             font-size: 1.1rem;
-            line-height: 1.2;
-        }
-        
-        .header-sub {
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            font-weight: 800;
+            margin: 0;
         }
 
         /* Search */
-        .search-container {
-            padding: 1rem;
-            position: sticky;
-            top: 73px; /* Height of header */
+        .search-box {
+            padding: 0.75rem 1rem;
             background: var(--bg);
+            position: sticky;
+            top: 60px; /* Height of header */
             z-index: 90;
             border-bottom: 1px solid var(--border);
         }
 
-        .search-input {
+        input {
             width: 100%;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            padding: 0.75rem 1rem;
-            padding-right: 2.5rem;
             border-radius: 8px;
+            padding: 0.8rem 1rem;
             color: var(--text-main);
             font-family: inherit;
             font-size: 1rem;
+            outline: none;
             transition: border-color 0.2s;
         }
 
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
+        input:focus { border-color: var(--accent); }
+        input::placeholder { color: var(--text-muted); }
 
-        .search-icon {
-            position: absolute;
-            right: 1.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        /* Layout Grid */
-        .drugs-list {
+        /* Container */
+        .list-container {
             padding: 0.5rem;
-            display: grid;
-            gap: 0.5rem;
         }
 
-        /* Desktop Table View (Hidden on Mobile) */
+        /* Desktop Table View */
         @media (min-width: 768px) {
-            .drugs-list {
+            .list-container {
+                max-width: 800px;
+                margin: 1rem auto;
                 padding: 1rem;
-                display: block;
-                overflow-x: auto;
             }
             
-            .mobile-card {
-                display: none !important;
-            }
+            .card-item { display: none !important; }
 
             table {
                 width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
+                border-collapse: collapse;
+                background: var(--bg-card);
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             }
 
             th {
                 text-align: right;
                 padding: 1rem;
-                color: var(--text-muted);
-                font-weight: 600;
                 font-size: 0.85rem;
-                border-bottom: 2px solid var(--border);
-                position: sticky;
-                top: 130px; /* Header + Search height */
-                background: var(--bg);
+                color: var(--text-muted);
+                border-bottom: 1px solid var(--border);
             }
 
             td {
                 padding: 1rem;
                 border-bottom: 1px solid var(--border);
-                background: var(--bg-card);
-                transition: background 0.2s;
             }
 
-            tr:hover td {
-                background: var(--bg-hover);
-            }
-            
-            .price-cell {
-                font-weight: 700;
-                color: var(--accent-light);
+            tr:last-child td { border-bottom: none; }
+
+            .price-col {
+                text-align: left;
+                direction: ltr;
+                font-weight: 600;
+                color: var(--accent);
             }
         }
 
-        /* Mobile Card View (Hidden on Desktop) */
+        /* Mobile Card View */
         @media (max-width: 767px) {
-            table, thead, tbody, th, td, tr {
-                display: none;
-            }
+            table, thead, tbody, tr, th, td { display: none; }
 
-            .mobile-card {
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                padding: 1rem;
-                display: block;
-                transition: transform 0.1s, background 0.2s;
-            }
-
-            .mobile-card:active {
-                background: var(--bg-hover);
-                transform: scale(0.98);
-            }
-
-            .card-header {
+            .card-item {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 0.75rem;
-                padding-bottom: 0.75rem;
-                border-bottom: 1px dashed var(--border);
+                background: var(--bg-card);
+                margin-bottom: 0.5rem;
+                padding: 1rem;
+                border-radius: 8px;
+                border-left: 4px solid var(--accent);
             }
 
-            .drug-title {
-                font-family: 'Noto Kufi Arabic', sans-serif;
-                font-weight: 700;
-                font-size: 1.1rem;
-                color: var(--text-main);
+            .name {
+                font-weight: 500;
+                font-size: 1rem;
             }
 
-            .drug-price {
+            .price {
                 font-family: 'Noto Kufi Arabic', sans-serif;
                 font-weight: 800;
-                color: var(--accent);
                 font-size: 1.1rem;
-            }
-
-            .card-details {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 0.5rem;
-                font-size: 0.85rem;
-            }
-
-            .detail-item {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .detail-label {
-                color: var(--text-muted);
-                font-size: 0.7rem;
-                margin-bottom: 0.2rem;
-            }
-
-            .detail-value {
-                color: var(--text-main);
-                font-weight: 500;
+                color: var(--accent);
+                direction: ltr; /* English Numbers */
             }
         }
 
-        /* Loading & Errors */
-        .status-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem 2rem;
+        /* Status */
+        .status-msg {
             text-align: center;
+            padding: 3rem 1rem;
             color: var(--text-muted);
+            font-size: 0.9rem;
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border);
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -262,38 +178,16 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header>
-        <div class="header-content">
-            <div class="logo-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M10.5 20.5L3.5 13.5C2.5 12.5 2.5 10.5 3.5 9.5L9.5 3.5C10.5 2.5 12.5 2.5 13.5 3.5L20.5 10.5C21.5 11.5 21.5 13.5 20.5 14.5L14.5 20.5C13.5 21.5 11.5 21.5 10.5 20.5Z"/>
-                    <path d="M8 12H16"/>
-                </svg>
-            </div>
-            <div>
-                <div class="header-title">مستشفى بغداد التعليمي</div>
-                <div class="header-sub">قائمة أسعار الأدوية</div>
-            </div>
-        </div>
+        <h1>قائمة أسعار الأدوية</h1>
     </header>
 
-    <!-- Search -->
-    <div class="search-container">
-        <div style="position: relative;">
-            <input type="text" id="searchInput" class="search-input" placeholder="ابحث باسم الدواء...">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-            </svg>
-        </div>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="ابحث باسم الدواء...">
     </div>
 
-    <!-- Content -->
-    <div id="appContent" class="drugs-list">
-        <div class="status-container">
-            <div class="spinner"></div>
-            <p>جاري تحميل البيانات...</p>
-        </div>
+    <div id="app" class="list-container">
+        <div class="status-msg"><div class="spinner"></div>جاري التحميل...</div>
     </div>
 
     <script>
@@ -301,14 +195,14 @@
         // Configuration
         // ==========================================
         const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
-
+        
         let drugsData = [];
 
         // ==========================================
         // Initialization
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            // Load Data
+            // Use Demo Data if URL not set
             if (APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
                 loadDemoData();
             } else {
@@ -317,8 +211,7 @@
 
             // Search Listener
             document.getElementById('searchInput').addEventListener('input', (e) => {
-                const term = e.target.value.trim().toLowerCase();
-                renderDrugs(term);
+                renderList(e.target.value.trim().toLowerCase());
             });
         });
 
@@ -329,113 +222,77 @@
             try {
                 const res = await fetch(APPS_SCRIPT_URL);
                 const data = await res.json();
-                if (data.error) throw new Error(data.error);
                 drugsData = data;
-                renderDrugs();
+                renderList();
             } catch (err) {
-                document.getElementById('appContent').innerHTML = `
-                    <div class="status-container">
-                        <p style="color: #f87171;">حدث خطأ في الاتصال</p>
-                        <button onclick="fetchDrugs()" style="margin-top: 1rem; background: var(--bg-hover); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; color: white; cursor: pointer;">إعادة المحاولة</button>
-                    </div>
-                `;
+                document.getElementById('app').innerHTML = '<div class="status-msg">خطأ في الاتصال</div>';
             }
         }
 
         function loadDemoData() {
             drugsData = [
-                { Drug_Name: 'باراسيتامول', Pack_Size: 10, Pack_Price: 250 },
-                { Drug_Name: 'أموكسيسيلين', Pack_Size: 12, Pack_Price: 600 },
-                { Drug_Name: 'ميروبينيم', Pack_Size: 1, Pack_Price: 15000 },
-                { Drug_Name: 'فانكومايسين', Pack_Size: 1, Pack_Price: 12000 },
-                { Drug_Name: 'سيبروفلوكساسين', Pack_Size: 10, Pack_Price: 750 },
-                { Drug_Name: 'أوميبرازول', Pack_Size: 14, Pack_Price: 980 },
-                { Drug_Name: 'ميترونيدازول', Pack_Size: 20, Pack_Price: 1200 },
-                { Drug_Name: 'سيفترياكسون', Pack_Size: 1, Pack_Price: 850 }
+                { Drug_Name: 'باراسيتامول', Unit_Price: 250 },
+                { Drug_Name: 'أموكسيسيلين', Unit_Price: 500 },
+                { Drug_Name: 'ميروبينيم', Unit_Price: 15000 },
+                { Drug_Name: 'فانكومايسين', Unit_Price: 12000 },
+                { Drug_Name: 'سيبروفلوكساسين', Unit_Price: 750 },
+                { Drug_Name: 'أوميبرازول', Unit_Price: 980 },
+                { Drug_Name: 'سيفترياكسون', Unit_Price: 850 }
             ];
-            renderDrugs();
+            renderList();
         }
 
         // ==========================================
-        // Rendering Logic
+        // Rendering
         // ==========================================
-        function renderDrugs(filter = '') {
+        function renderList(filter = '') {
             const filtered = drugsData.filter(d => d.Drug_Name.toLowerCase().includes(filter));
             
-            // Generate Desktop Table HTML
+            if (filtered.length === 0) {
+                document.getElementById('app').innerHTML = '<div class="status-msg">لا توجد نتائج</div>';
+                return;
+            }
+
+            // 1. Desktop Table HTML
             let tableHTML = `
                 <table>
                     <thead>
                         <tr>
                             <th>اسم الدواء</th>
-                            <th>حجم العبوة</th>
-                            <th>سعر العبوة</th>
-                            <th>سعر الوحدة</th>
+                            <th style="text-align: left;">السعر (دينار)</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-            // Generate Mobile Card HTML
+            // 2. Mobile Cards HTML
             let cardsHTML = '';
 
-            if (filtered.length === 0) {
-                document.getElementById('appContent').innerHTML = `
-                    <div class="status-container">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.5; margin-bottom:1rem;">
-                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-                        </svg>
-                        <p>لا توجد نتائج</p>
-                    </div>
-                `;
-                return;
-            }
-
             filtered.forEach(drug => {
-                const unitPrice = (drug.Pack_Price / drug.Pack_Size).toFixed(2);
+                // English formatted number
+                const priceFormatted = drug.Unit_Price.toLocaleString('en-US');
 
                 // Desktop Row
                 tableHTML += `
                     <tr>
-                        <td style="font-weight:600;">${drug.Drug_Name}</td>
-                        <td>${drug.Pack_Size}</td>
-                        <td style="color:var(--text-main)">${formatNum(drug.Pack_Price)}</td>
-                        <td class="price-cell">${formatNum(unitPrice)}</td>
+                        <td style="font-weight: 500;">${drug.Drug_Name}</td>
+                        <td class="price-col">${priceFormatted}</td>
                     </tr>
                 `;
 
                 // Mobile Card
                 cardsHTML += `
-                    <div class="mobile-card">
-                        <div class="card-header">
-                            <span class="drug-title">${drug.Drug_Name}</span>
-                            <span class="drug-price">${formatNum(drug.Pack_Price)} د.ع</span>
-                        </div>
-                        <div class="card-details">
-                            <div class="detail-item">
-                                <span class="detail-label">حجم العبوة</span>
-                                <span class="detail-value">${drug.Pack_Size} وحدة</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">سعر الوحدة</span>
-                                <span class="detail-value" style="color:var(--accent-light)">${formatNum(unitPrice)} د.ع</span>
-                            </div>
-                        </div>
+                    <div class="card-item">
+                        <span class="name">${drug.Drug_Name}</span>
+                        <span class="price">${priceFormatted}</span>
                     </div>
                 `;
             });
 
             tableHTML += '</tbody></table>';
 
-            // Combine: CSS media queries handle which one is visible
-            document.getElementById('appContent').innerHTML = tableHTML + cardsHTML;
-        }
-
-        // ==========================================
-        // Helpers
-        // ==========================================
-        function formatNum(n) {
-            return new Intl.NumberFormat('ar-IQ').format(n);
+            // Combine both (CSS handles visibility)
+            document.getElementById('app').innerHTML = tableHTML + cardsHTML;
         }
     </script>
 
