@@ -2,557 +2,307 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام أسعار الأدوية - مستشفى بغداد التعليمي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أسعار الأدوية - مستشفى بغداد</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         :root {
-            --bg-primary: #0a0f14;
-            --bg-secondary: #111921;
-            --bg-card: #151d27;
-            --bg-elevated: #1a2533;
-            --fg-primary: #e8edf3;
-            --fg-secondary: #8a9bb0;
-            --fg-muted: #5a6b7d;
-            --accent: #00d4aa;
-            --accent-dim: #00a88a;
-            --accent-glow: rgba(0, 212, 170, 0.15);
-            --border: #243040;
-            --warning: #ffc857;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --accent: #14b8a6; /* Teal */
+            --accent-light: #5eead4;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'IBM Plex Sans Arabic', sans-serif;
-            background: var(--bg-primary);
-            color: var(--fg-primary);
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
-            line-height: 1.7;
-            overflow-x: hidden;
         }
 
-        .bg-pattern {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            background: 
-                radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-glow), transparent),
-                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 100, 80, 0.1), transparent);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
+        /* Header Styles */
         header {
-            padding: 1.5rem 0;
+            background: linear-gradient(180deg, rgba(20, 184, 166, 0.1) 0%, transparent 100%);
             border-bottom: 1px solid var(--border);
-            background: linear-gradient(180deg, var(--bg-secondary), transparent);
+            padding: 1rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+            gap: 0.75rem;
         }
-
-        .logo-section { display: flex; align-items: center; gap: 1rem; }
 
         .logo-icon {
-            width: 50px; height: 50px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 32px var(--accent-glow);
+            color: white;
         }
 
-        .logo-icon svg { width: 28px; height: 28px; color: var(--bg-primary); }
-
-        .header-text h1 {
+        .header-title {
             font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--fg-primary);
-        }
-
-        .header-text p { font-size: 0.85rem; color: var(--fg-secondary); margin-top: 0.2rem; }
-
-        /* Main Layout */
-        main { padding: 2rem 0 4rem; }
-
-        .section {
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.5s ease forwards;
-        }
-        .section:nth-child(1) { animation-delay: 0.1s; }
-        .section:nth-child(2) { animation-delay: 0.2s; }
-        .section:nth-child(3) { animation-delay: 0.3s; }
-
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .section-icon {
-            width: 36px; height: 36px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent);
-        }
-
-        .section-title {
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--fg-primary);
+            font-size: 1.1rem;
+            line-height: 1.2;
         }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1.25rem;
-            transition: all 0.3s ease;
+        
+        .header-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         /* Search */
-        .search-wrapper { position: relative; }
+        .search-container {
+            padding: 1rem;
+            position: sticky;
+            top: 73px; /* Height of header */
+            background: var(--bg);
+            z-index: 90;
+            border-bottom: 1px solid var(--border);
+        }
 
         .search-input {
             width: 100%;
-            padding: 0.9rem 1.2rem;
-            padding-right: 3rem;
-            background: var(--bg-elevated);
-            border: 2px solid var(--border);
-            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            padding-right: 2.5rem;
+            border-radius: 8px;
+            color: var(--text-main);
             font-family: inherit;
-            font-size: 0.95rem;
-            color: var(--fg-primary);
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            transition: border-color 0.2s;
         }
 
-        .search-input::placeholder { color: var(--fg-muted); }
         .search-input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-glow);
         }
 
         .search-icon {
             position: absolute;
-            right: 1rem;
+            right: 1.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--fg-muted);
+            color: var(--text-muted);
         }
 
-        .results-count {
-            margin-top: 0.6rem;
-            font-size: 0.85rem;
-            color: var(--fg-secondary);
-        }
-        .results-count span { color: var(--accent); font-weight: 600; }
-
-        /* Table */
-        .table-container {
-            overflow-x: auto;
-            max-height: 350px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        
-        thead { position: sticky; top: 0; z-index: 10; }
-
-        th {
-            background: var(--bg-elevated);
-            padding: 0.8rem 1rem;
-            text-align: right;
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--fg-secondary);
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--fg-primary);
-            transition: background 0.2s ease;
-        }
-
-        tbody tr {
-            background: var(--bg-card);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        tbody tr:hover { background: var(--bg-elevated); }
-        tbody tr.selected {
-            background: var(--accent-glow);
-            border-right: 3px solid var(--accent);
-        }
-
-        .drug-name { font-weight: 600; }
-        .price { font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; color: var(--accent); }
-        
-        .unit-badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            background: rgba(0, 212, 170, 0.1);
-            color: var(--accent);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Calculator */
-        .calc-layout {
+        /* Layout Grid */
+        .drugs-list {
+            padding: 0.5rem;
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 0.5rem;
         }
+
+        /* Desktop Table View (Hidden on Mobile) */
         @media (min-width: 768px) {
-            .calc-layout { grid-template-columns: 1fr 1fr; }
+            .drugs-list {
+                padding: 1rem;
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .mobile-card {
+                display: none !important;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            th {
+                text-align: right;
+                padding: 1rem;
+                color: var(--text-muted);
+                font-weight: 600;
+                font-size: 0.85rem;
+                border-bottom: 2px solid var(--border);
+                position: sticky;
+                top: 130px; /* Header + Search height */
+                background: var(--bg);
+            }
+
+            td {
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                background: var(--bg-card);
+                transition: background 0.2s;
+            }
+
+            tr:hover td {
+                background: var(--bg-hover);
+            }
+            
+            .price-cell {
+                font-weight: 700;
+                color: var(--accent-light);
+            }
         }
 
-        .info-box {
-            background: linear-gradient(135deg, var(--bg-elevated), var(--bg-card));
-            border-radius: 10px;
-            padding: 1.25rem;
-            border: 1px solid var(--border);
+        /* Mobile Card View (Hidden on Desktop) */
+        @media (max-width: 767px) {
+            table, thead, tbody, th, td, tr {
+                display: none;
+            }
+
+            .mobile-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 1rem;
+                display: block;
+                transition: transform 0.1s, background 0.2s;
+            }
+
+            .mobile-card:active {
+                background: var(--bg-hover);
+                transform: scale(0.98);
+            }
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px dashed var(--border);
+            }
+
+            .drug-title {
+                font-family: 'Noto Kufi Arabic', sans-serif;
+                font-weight: 700;
+                font-size: 1.1rem;
+                color: var(--text-main);
+            }
+
+            .drug-price {
+                font-family: 'Noto Kufi Arabic', sans-serif;
+                font-weight: 800;
+                color: var(--accent);
+                font-size: 1.1rem;
+            }
+
+            .card-details {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .detail-label {
+                color: var(--text-muted);
+                font-size: 0.7rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .detail-value {
+                color: var(--text-main);
+                font-weight: 500;
+            }
         }
 
-        .info-box.empty {
+        /* Loading & Errors */
+        .status-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 4rem 2rem;
             text-align: center;
-            min-height: 140px;
-            color: var(--fg-muted);
+            color: var(--text-muted);
         }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: var(--fg-secondary); font-size: 0.9rem; }
-        .info-value { font-weight: 600; color: var(--fg-primary); }
-        .info-value.highlight { color: var(--accent); font-size: 1.1rem; }
-
-        .mode-switcher {
-            display: flex;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 0.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 0.5rem;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            color: var(--fg-secondary);
-            font-family: inherit;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .mode-btn.active {
-            background: var(--accent);
-            color: var(--bg-primary);
-            font-weight: 600;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--fg-secondary);
-            margin-bottom: 0.4rem;
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .qty-btn {
-            width: 44px; height: 44px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--fg-primary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .qty-btn:hover { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
-        .qty-btn:active { transform: scale(0.95); }
-
-        .qty-input {
-            flex: 1;
-            padding: 0 1rem;
-            height: 44px;
-            background: var(--bg-elevated);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--fg-primary);
-            text-align: center;
-            direction: ltr;
-        }
-        .qty-input:focus { outline: none; border-color: var(--accent); }
-
-        /* Result */
-        .result-box {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), transparent);
-            border: 2px solid var(--accent);
-            border-radius: 14px;
-            padding: 1.5rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .result-label { font-size: 0.9rem; color: var(--fg-secondary); margin-bottom: 0.3rem; }
-        .result-value {
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--accent);
-            line-height: 1.2;
-        }
-        .result-currency { font-size: 1rem; color: var(--fg-secondary); margin-top: 0.25rem; }
-
-        /* Loading & Errors */
-        .loading { text-align: center; padding: 3rem; color: var(--fg-secondary); }
+        
         .spinner {
-            width: 40px; height: 40px;
-            border: 3px solid var(--border);
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            margin-bottom: 1rem;
         }
+
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .error-box {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid var(--danger);
-            padding: 1.5rem;
-            text-align: center;
-            border-radius: 10px;
-            color: #ff6b6b;
-        }
-        .retry-btn {
-            margin-top: 1rem;
-            padding: 0.5rem 1.5rem;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--fg-primary);
-            cursor: pointer;
-        }
-
-        footer {
-            padding: 1.5rem 0;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--fg-muted);
-            font-size: 0.8rem;
-        }
     </style>
 </head>
 <body>
 
-    <div class="bg-pattern"></div>
-
+    <!-- Header -->
     <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10.5 20.5L3.5 13.5C2.5 12.5 2.5 10.5 3.5 9.5L9.5 3.5C10.5 2.5 12.5 2.5 13.5 3.5L20.5 10.5C21.5 11.5 21.5 13.5 20.5 14.5L14.5 20.5C13.5 21.5 11.5 21.5 10.5 20.5Z"/>
-                            <path d="M8 12H16"/><path d="M12 8V16"/>
-                        </svg>
-                    </div>
-                    <div class="header-text">
-                        <h1>مستشفى بغداد التعليمي</h1>
-                        <p>قسم الصيدلية - نظام احتساب أسعار الأدوية</p>
-                    </div>
-                </div>
+        <div class="header-content">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M10.5 20.5L3.5 13.5C2.5 12.5 2.5 10.5 3.5 9.5L9.5 3.5C10.5 2.5 12.5 2.5 13.5 3.5L20.5 10.5C21.5 11.5 21.5 13.5 20.5 14.5L14.5 20.5C13.5 21.5 11.5 21.5 10.5 20.5Z"/>
+                    <path d="M8 12H16"/>
+                </svg>
+            </div>
+            <div>
+                <div class="header-title">مستشفى بغداد التعليمي</div>
+                <div class="header-sub">قائمة أسعار الأدوية</div>
             </div>
         </div>
     </header>
 
-    <main>
-        <div class="container">
-            <!-- Search -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    </div>
-                    <h2 class="section-title">البحث عن دواء</h2>
-                </div>
-                <div class="card">
-                    <div class="search-wrapper">
-                        <input type="text" class="search-input" id="searchInput" placeholder="اكتب اسم الدواء...">
-                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    </div>
-                    <p class="results-count">عدد النتائج: <span id="drugCount">0</span></p>
-                </div>
-            </section>
-
-            <!-- Table -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-                    </div>
-                    <h2 class="section-title">قائمة الأدوية</h2>
-                </div>
-                <div class="card" style="padding:0; overflow:hidden;">
-                    <div id="tableContainer" class="table-container">
-                        <div class="loading"><div class="spinner"></div><p>جاري التحميل...</p></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Calculator -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/></svg>
-                    </div>
-                    <h2 class="section-title">حاسبة السعر</h2>
-                </div>
-                
-                <div class="calc-layout">
-                    <!-- Drug Info Panel -->
-                    <div class="info-box empty" id="drugInfoBox">
-                        <p>اختر دواء من القائمة لعرض التفاصيل</p>
-                    </div>
-
-                    <!-- Calculator Controls -->
-                    <div class="card" id="calcControls" style="display:none;">
-                        <div class="mode-switcher">
-                            <button class="mode-btn active" data-mode="unit">حساب بالوحدات</button>
-                            <button class="mode-btn" data-mode="pack">حساب بالعبوات</button>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label id="qtyLabel">الكمية (وحدات)</label>
-                            <div class="input-wrapper">
-                                <button class="qty-btn" id="decBtn">-</button>
-                                <input type="number" class="qty-input" id="qtyInput" value="1" min="1">
-                                <button class="qty-btn" id="incBtn">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Result -->
-            <section class="section">
-                <div class="result-box">
-                    <p class="result-label">المبلغ الإجمالي</p>
-                    <p class="result-value" id="totalResult">0</p>
-                    <p class="result-currency">دينار عراقي</p>
-                </div>
-            </section>
+    <!-- Search -->
+    <div class="search-container">
+        <div style="position: relative;">
+            <input type="text" id="searchInput" class="search-input" placeholder="ابحث باسم الدواء...">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <div class="container">
-            <p>جميع الحقوق محفوظة - مستشفى بغداد التعليمي 2024</p>
+    <!-- Content -->
+    <div id="appContent" class="drugs-list">
+        <div class="status-container">
+            <div class="spinner"></div>
+            <p>جاري تحميل البيانات...</p>
         </div>
-    </footer>
+    </div>
 
     <script>
         // ==========================================
         // Configuration
         // ==========================================
         const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
-        
-        // ==========================================
-        // State
-        // ==========================================
-        let drugsData = [];
-        let selectedDrug = null;
-        let calcMode = 'unit'; // 'unit' or 'pack'
 
-        // ==========================================
-        // DOM Elements
-        // ==========================================
-        const els = {
-            search: document.getElementById('searchInput'),
-            count: document.getElementById('drugCount'),
-            table: document.getElementById('tableContainer'),
-            infoBox: document.getElementById('drugInfoBox'),
-            controls: document.getElementById('calcControls'),
-            qtyLabel: document.getElementById('qtyLabel'),
-            qtyInput: document.getElementById('qtyInput'),
-            total: document.getElementById('totalResult')
-        };
+        let drugsData = [];
 
         // ==========================================
         // Initialization
@@ -565,20 +315,15 @@
                 fetchDrugs();
             }
 
-            // Event Listeners
-            els.search.addEventListener('input', handleSearch);
-            
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+            // Search Listener
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const term = e.target.value.trim().toLowerCase();
+                renderDrugs(term);
             });
-
-            els.qtyInput.addEventListener('input', calculateTotal);
-            document.getElementById('incBtn').addEventListener('click', () => changeQty(1));
-            document.getElementById('decBtn').addEventListener('click', () => changeQty(-1));
         });
 
         // ==========================================
-        // Data Functions
+        // Data Fetching
         // ==========================================
         async function fetchDrugs() {
             try {
@@ -586,9 +331,14 @@
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
                 drugsData = data;
-                renderTable(drugsData);
+                renderDrugs();
             } catch (err) {
-                els.table.innerHTML = `<div class="error-box"><p>فشل تحميل البيانات: ${err.message}</p><button class="retry-btn" onclick="fetchDrugs()">إعادة المحاولة</button></div>`;
+                document.getElementById('appContent').innerHTML = `
+                    <div class="status-container">
+                        <p style="color: #f87171;">حدث خطأ في الاتصال</p>
+                        <button onclick="fetchDrugs()" style="margin-top: 1rem; background: var(--bg-hover); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; color: white; cursor: pointer;">إعادة المحاولة</button>
+                    </div>
+                `;
             }
         }
 
@@ -599,138 +349,86 @@
                 { Drug_Name: 'ميروبينيم', Pack_Size: 1, Pack_Price: 15000 },
                 { Drug_Name: 'فانكومايسين', Pack_Size: 1, Pack_Price: 12000 },
                 { Drug_Name: 'سيبروفلوكساسين', Pack_Size: 10, Pack_Price: 750 },
-                { Drug_Name: 'أوميبرازول', Pack_Size: 14, Pack_Price: 980 }
+                { Drug_Name: 'أوميبرازول', Pack_Size: 14, Pack_Price: 980 },
+                { Drug_Name: 'ميترونيدازول', Pack_Size: 20, Pack_Price: 1200 },
+                { Drug_Name: 'سيفترياكسون', Pack_Size: 1, Pack_Price: 850 }
             ];
-            renderTable(drugsData);
+            renderDrugs();
         }
 
         // ==========================================
-        // Render Functions
+        // Rendering Logic
         // ==========================================
-        function renderTable(data) {
-            els.count.textContent = data.length;
+        function renderDrugs(filter = '') {
+            const filtered = drugsData.filter(d => d.Drug_Name.toLowerCase().includes(filter));
             
-            if (!data.length) {
-                els.table.innerHTML = '<div class="loading"><p>لا توجد نتائج</p></div>';
-                return;
-            }
-
-            let html = `<table>
-                <thead><tr>
-                    <th>اسم الدواء</th>
-                    <th>حجم العبوة</th>
-                    <th>سعر العبوة</th>
-                    <th>سعر الوحدة</th>
-                </tr></thead><tbody>`;
-
-            data.forEach((d, i) => {
-                const unitPrice = d.Pack_Price / d.Pack_Size;
-                html += `<tr data-idx="${i}" onclick="selectDrug(${i})">
-                    <td class="drug-name">${d.Drug_Name}</td>
-                    <td><span class="unit-badge">${d.Pack_Size} وحدة</span></td>
-                    <td class="price">${formatNum(d.Pack_Price)}</td>
-                    <td>${formatNum(unitPrice.toFixed(2))}</td>
-                </tr>`;
-            });
-            
-            html += '</tbody></table>';
-            els.table.innerHTML = html;
-        }
-
-        function renderInfoBox(drug) {
-            if(!drug) {
-                els.infoBox.className = 'info-box empty';
-                els.infoBox.innerHTML = '<p>اختر دواء من القائمة لعرض التفاصيل</p>';
-                els.controls.style.display = 'none';
-                return;
-            }
-
-            const unitPrice = drug.Pack_Price / drug.Pack_Size;
-            
-            els.infoBox.className = 'info-box';
-            els.infoBox.innerHTML = `
-                <h3 style="font-family: 'Noto Kufi Arabic', sans-serif; font-size:1.2rem; margin-bottom:1rem; color:var(--fg-primary);">${drug.Drug_Name}</h3>
-                <div class="info-row">
-                    <span class="info-label">حجم العبوة</span>
-                    <span class="info-value">${drug.Pack_Size} وحدة</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">سعر العبوة</span>
-                    <span class="info-value">${formatNum(drug.Pack_Price)} دينار</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">سعر الوحدة (محسوب)</span>
-                    <span class="info-value highlight">${formatNum(unitPrice.toFixed(2))} دينار</span>
-                </div>
+            // Generate Desktop Table HTML
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الدواء</th>
+                            <th>حجم العبوة</th>
+                            <th>سعر العبوة</th>
+                            <th>سعر الوحدة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
-            els.controls.style.display = 'block';
-        }
 
-        // ==========================================
-        // Interaction Logic
-        // ==========================================
-        function handleSearch(e) {
-            const term = e.target.value.trim().toLowerCase();
-            const filtered = drugsData.filter(d => d.Drug_Name.toLowerCase().includes(term));
-            renderTable(filtered);
-        }
+            // Generate Mobile Card HTML
+            let cardsHTML = '';
 
-        function selectDrug(index) {
-            // Find drug in original array (in case of search filter)
-            // Since we pass the index from the currently rendered data,
-            // we need to map it back or just store the reference.
-            // Simplified: We assume the rendered list matches current filter state.
-            
-            const term = els.search.value.trim().toLowerCase();
-            const currentList = term ? drugsData.filter(d => d.Drug_Name.toLowerCase().includes(term)) : drugsData;
-            
-            selectedDrug = currentList[index];
-
-            // Highlight
-            document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
-            document.querySelector(`tr[data-idx="${index}"]`)?.classList.add('selected');
-
-            // Update UI
-            renderInfoBox(selectedDrug);
-            els.qtyInput.value = 1;
-            calculateTotal();
-        }
-
-        function switchMode(mode) {
-            calcMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
-            
-            els.qtyLabel.textContent = mode === 'unit' ? 'الكمية (وحدات)' : 'الكمية (عبوات)';
-            els.qtyInput.value = 1;
-            calculateTotal();
-        }
-
-        function changeQty(delta) {
-            let val = parseInt(els.qtyInput.value) || 1;
-            val = Math.max(1, val + delta);
-            els.qtyInput.value = val;
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            if (!selectedDrug) return;
-
-            const qty = parseInt(els.qtyInput.value) || 0;
-            const packPrice = selectedDrug.Pack_Price;
-            const packSize = selectedDrug.Pack_Size;
-            
-            let total = 0;
-
-            if (calcMode === 'pack') {
-                total = qty * packPrice;
-            } else {
-                // Unit mode
-                const unitPrice = packPrice / packSize;
-                total = qty * unitPrice;
+            if (filtered.length === 0) {
+                document.getElementById('appContent').innerHTML = `
+                    <div class="status-container">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.5; margin-bottom:1rem;">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                        </svg>
+                        <p>لا توجد نتائج</p>
+                    </div>
+                `;
+                return;
             }
 
-            animateNumber(els.total, total);
+            filtered.forEach(drug => {
+                const unitPrice = (drug.Pack_Price / drug.Pack_Size).toFixed(2);
+
+                // Desktop Row
+                tableHTML += `
+                    <tr>
+                        <td style="font-weight:600;">${drug.Drug_Name}</td>
+                        <td>${drug.Pack_Size}</td>
+                        <td style="color:var(--text-main)">${formatNum(drug.Pack_Price)}</td>
+                        <td class="price-cell">${formatNum(unitPrice)}</td>
+                    </tr>
+                `;
+
+                // Mobile Card
+                cardsHTML += `
+                    <div class="mobile-card">
+                        <div class="card-header">
+                            <span class="drug-title">${drug.Drug_Name}</span>
+                            <span class="drug-price">${formatNum(drug.Pack_Price)} د.ع</span>
+                        </div>
+                        <div class="card-details">
+                            <div class="detail-item">
+                                <span class="detail-label">حجم العبوة</span>
+                                <span class="detail-value">${drug.Pack_Size} وحدة</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">سعر الوحدة</span>
+                                <span class="detail-value" style="color:var(--accent-light)">${formatNum(unitPrice)} د.ع</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+
+            // Combine: CSS media queries handle which one is visible
+            document.getElementById('appContent').innerHTML = tableHTML + cardsHTML;
         }
 
         // ==========================================
@@ -739,21 +437,7 @@
         function formatNum(n) {
             return new Intl.NumberFormat('ar-IQ').format(n);
         }
-
-        function animateNumber(el, target) {
-            const current = parseFloat(el.textContent.replace(/[^\d.-]/g, '')) || 0;
-            const duration = 300;
-            const start = performance.now();
-            
-            function update(now) {
-                const progress = Math.min((now - start) / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                const val = current + (target - current) * eased;
-                el.textContent = formatNum(Math.round(val));
-                if (progress < 1) requestAnimationFrame(update);
-            }
-            requestAnimationFrame(update);
-        }
     </script>
+
 </body>
 </html>
