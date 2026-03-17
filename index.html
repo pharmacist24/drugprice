@@ -1,300 +1,1114 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>أسعار الأدوية</title>
-    
-    <!-- Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Drug Pricing</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;800&family=IBM+Plex+Sans+Arabic:wght@400;500&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg: #121212;
-            --bg-card: #1E1E1E;
-            --accent: #00E676; /* Green */
-            --text-main: #FFFFFF;
-            --text-muted: #9E9E9E;
-            --border: #2C2C2C;
+            --bg-primary: #0c1929;
+            --bg-secondary: #122235;
+            --bg-card: #182b45;
+            --bg-card-hover: #1f3a5a;
+            --text-primary: #f0f5fa;
+            --text-secondary: #8fa3bf;
+            --text-muted: #5a7091;
+            --accent-primary: #00c9a7;
+            --accent-secondary: #00e5be;
+            --accent-glow: rgba(0, 201, 167, 0.25);
+            --price-highlight: #00e5be;
+            --price-secondary: #6ee7b7;
+            --border-subtle: #2a4263;
+            --border-accent: rgba(0, 201, 167, 0.35);
+            --danger: #f87171;
+            --warning: #fbbf24;
         }
 
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'IBM Plex Sans Arabic', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        [dir="rtl"] body {
+            font-family: 'IBM Plex Sans Arabic', 'Outfit', sans-serif;
+        }
+
+        /* Atmospheric Background */
+        .atmosphere {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: var(--bg-primary);
+        }
+
+        .atmosphere::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse, rgba(0, 201, 167, 0.08) 0%, transparent 60%);
+            animation: floatBlob 20s ease-in-out infinite;
+        }
+
+        .atmosphere::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(ellipse, rgba(59, 130, 246, 0.06) 0%, transparent 55%);
+            animation: floatBlob 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5%, 8%) scale(1.05); }
+            66% { transform: translate(-3%, 5%) scale(0.95); }
+        }
+
+        /* Grid Pattern Overlay */
+        .grid-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(42, 66, 99, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(42, 66, 99, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 20%, transparent 70%);
         }
 
         /* Header */
-        header {
-            padding: 1.25rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
+        .header {
             position: sticky;
             top: 0;
             z-index: 100;
+            background: rgba(12, 25, 41, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        h1 {
-            font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 800;
-            margin: 0;
+        .header-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 16px 20px;
         }
 
-        /* Search */
-        .search-box {
-            padding: 0.75rem 1rem;
-            background: var(--bg);
-            position: sticky;
-            top: 60px; /* Height of header */
-            z-index: 90;
-            border-bottom: 1px solid var(--border);
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        input {
-            width: 100%;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
 
-        input:focus { border-color: var(--accent); }
-        input::placeholder { color: var(--text-muted); }
-
-        /* Container */
-        .list-container {
-            padding: 0.5rem;
+        .brand-text h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
         }
 
-        /* Desktop Table View */
-        @media (min-width: 768px) {
-            .list-container {
-                max-width: 800px;
-                margin: 1rem auto;
-                padding: 1rem;
-            }
-            
-            .card-item { display: none !important; }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                background: var(--bg-card);
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            }
-
-            th {
-                text-align: right;
-                padding: 1rem;
-                font-size: 0.85rem;
-                color: var(--text-muted);
-                border-bottom: 1px solid var(--border);
-            }
-
-            td {
-                padding: 1rem;
-                border-bottom: 1px solid var(--border);
-            }
-
-            tr:last-child td { border-bottom: none; }
-
-            .price-col {
-                text-align: left;
-                direction: ltr;
-                font-weight: 600;
-                color: var(--accent);
-            }
-        }
-
-        /* Mobile Card View */
-        @media (max-width: 767px) {
-            table, thead, tbody, tr, th, td { display: none; }
-
-            .card-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: var(--bg-card);
-                margin-bottom: 0.5rem;
-                padding: 1rem;
-                border-radius: 8px;
-                border-left: 4px solid var(--accent);
-            }
-
-            .name {
-                font-weight: 500;
-                font-size: 1rem;
-            }
-
-            .price {
-                font-family: 'Noto Kufi Arabic', sans-serif;
-                font-weight: 800;
-                font-size: 1.1rem;
-                color: var(--accent);
-                direction: ltr; /* English Numbers */
-            }
-        }
-
-        /* Status */
-        .status-msg {
-            text-align: center;
-            padding: 3rem 1rem;
+        .brand-text p {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-weight: 500;
         }
-        
-        .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
+
+        /* Search Section */
+        .search-section {
+            margin-top: 16px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 52px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [dir="rtl"] .search-input {
+            padding: 16px 52px 16px 20px;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: var(--bg-card-hover);
+            box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: color 0.25s ease;
+            pointer-events: none;
+        }
+
+        [dir="rtl"] .search-icon {
+            left: auto;
+            right: 18px;
+        }
+
+        .search-input:focus ~ .search-icon {
+            color: var(--accent-primary);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        [dir="rtl"] .search-clear {
+            right: auto;
+            left: 14px;
+        }
+
+        .search-clear.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .search-clear:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 24px 20px 100px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-chip .count {
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .stat-chip .label {
+            color: var(--text-secondary);
+        }
+
+        /* Drug Cards Grid */
+        .drugs-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Drug Card */
+        .drug-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 20px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drug-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .drug-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drug-card:hover::before {
+            opacity: 1;
+        }
+
+        .drug-card:hover {
+            border-color: var(--border-accent);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+        }
+
+        .drug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .drug-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.35;
+            flex: 1;
+        }
+
+        .dosage-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(0, 201, 167, 0.12);
+            border: 1px solid rgba(0, 201, 167, 0.25);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            white-space: nowrap;
+        }
+
+        .dosage-tag svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Price Section */
+        .price-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(42, 66, 99, 0.5);
+        }
+
+        .price-box {
+            padding: 14px;
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .price-box.total {
+            background: linear-gradient(135deg, rgba(0, 201, 167, 0.15) 0%, rgba(0, 229, 190, 0.08) 100%);
+            border: 1px solid rgba(0, 201, 167, 0.2);
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .price-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--price-highlight);
+            letter-spacing: -0.02em;
+        }
+
+        .price-box:not(.total) .price-value {
+            font-size: 1.05rem;
+            color: var(--price-secondary);
+        }
+
+        .price-currency {
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.75;
+            margin-left: 2px;
+        }
+
+        [dir="rtl"] .price-currency {
+            margin-left: 0;
+            margin-right: 2px;
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 56px;
+            height: 56px;
+            border: 4px solid var(--border-subtle);
+            border-top-color: var(--accent-primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            animation: spin 0.9s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
+        .loading-text {
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .loading-subtext {
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .empty-icon {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 24px;
+            background: rgba(0, 201, 167, 0.08);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-desc {
+            color: var(--text-muted);
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 48px 24px;
+            background: rgba(248, 113, 113, 0.08);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: 20px;
+        }
+
+        .error-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: rgba(248, 113, 113, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--danger);
+        }
+
+        .error-desc {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .retry-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: var(--text-secondary);
+        }
+
+        .lang-toggle:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: var(--bg-card-hover);
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .atmosphere::before,
+            .atmosphere::after,
+            .loading-spinner,
+            .drug-card {
+                animation: none;
+            }
+            .drug-card {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Focus States */
+        *:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Pulse animation for live indicator */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
     </style>
 </head>
 <body>
+    <!-- Background Effects -->
+    <div class="atmosphere"></div>
+    <div class="grid-pattern"></div>
 
-    <header>
-        <h1>قائمة أسعار الأدوية</h1>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="flex items-center justify-between">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+                            <path d="M10.5 20H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H20a2 2 0 0 1 2 2v3"/>
+                            <circle cx="18" cy="18" r="3"/>
+                            <path d="M18 14v8M14 18h8"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <h1 id="brandTitle">Pharmacy Pricing</h1>
+                        <p id="brandSubtitle">Hospital Drug Database</p>
+                    </div>
+                </div>
+                <button class="lang-toggle" onclick="toggleLanguage()" aria-label="Toggle language" title="Toggle Language">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="search-section">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Search drugs by name..."
+                        autocomplete="off"
+                        aria-label="Search drugs"
+                    >
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <button class="search-clear" id="clearSearch" aria-label="Clear search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ابحث باسم الدواء...">
-    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Stats Bar -->
+        <div class="stats-bar" id="statsBar" style="display: none;">
+            <div class="stat-chip">
+                <div class="pulse-dot"></div>
+                <span class="count" id="totalCount">0</span>
+                <span class="label" id="totalLabel">drugs available</span>
+            </div>
+            <div class="stat-chip" id="filteredStat" style="display: none;">
+                <span class="count" id="filteredCount">0</span>
+                <span class="label" id="filteredLabel">matching</span>
+            </div>
+        </div>
 
-    <div id="app" class="list-container">
-        <div class="status-msg"><div class="spinner"></div>جاري التحميل...</div>
-    </div>
+        <!-- Drugs Container -->
+        <div class="drugs-grid" id="drugsContainer">
+            <!-- Dynamic content -->
+        </div>
+    </main>
 
     <script>
-        // ==========================================
-        // Configuration
-        // ==========================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxt-cCpl1KWJjsFKggsHfyl_VFyqGS4FJlFzWKppsB00YtYcvEg8QcXiOtoih5_eQBf/exec';
-        
-        let drugsData = [];
+        // =====================================================
+        // CONFIGURATION
+        // =====================================================
+        const CONFIG = {
+            // Replace with your Google Apps Script Web App URL
+            API_URL: 'https://script.google.com/macros/s/AKfycbyw4PYm1ZMghqMN6rTMcLIq2I5rC-J3JIh_yf_PE7_bSuV4KdYC5SwGHRk9pTvTF5rT/exec',
+            CACHE_KEY: 'pharmacy_drugs_cache',
+            CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
+            SEARCH_DEBOUNCE: 200,
+            ANIMATION_DELAY: 40,
+        };
 
-        // ==========================================
-        // Initialization
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Use Demo Data if URL not set
-            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbxt-cCpl1KWJjsFKggsHfyl_VFyqGS4FJlFzWKppsB00YtYcvEg8QcXiOtoih5_eQBf/exec') {
-                loadDemoData();
-            } else {
-                fetchDrugs();
+        // =====================================================
+        // STATE
+        // =====================================================
+        let state = {
+            allDrugs: [],
+            filteredDrugs: [],
+            isLoading: false,
+            currentLang: 'en',
+            searchQuery: '',
+        };
+
+        // =====================================================
+        // INTERNATIONALIZATION
+        // =====================================================
+        const translations = {
+            en: {
+                brandTitle: 'Pharmacy Pricing',
+                brandSubtitle: 'Hospital Drug Database',
+                searchPlaceholder: 'Search drugs by name...',
+                totalDrugs: 'drugs available',
+                matching: 'matching',
+                loading: 'Loading drug database...',
+                loadingSub: 'Please wait while we fetch the latest prices',
+                noResults: 'No drugs found',
+                noResultsDesc: 'Try adjusting your search terms or check the spelling',
+                noData: 'No drug data available',
+                noDataDesc: 'Please check your data source connection',
+                errorTitle: 'Connection Failed',
+                errorDesc: 'Unable to fetch drug data. Please check your connection and try again.',
+                retryButton: 'Try Again',
+                totalPrice: 'Total Price',
+                unitPrice: 'Unit Price',
+            },
+            ar: {
+                brandTitle: 'أسعار الأدوية',
+                brandSubtitle: 'قاعدة بيانات المستشفى',
+                searchPlaceholder: 'ابحث عن الدواء...',
+                totalDrugs: 'دواء متوفر',
+                matching: 'نتيجة',
+                loading: 'جاري تحميل البيانات...',
+                loadingSub: 'يرجى الانتظار لتحميل الأسعار',
+                noResults: 'لم يتم العثور على نتائج',
+                noResultsDesc: 'حاول تعديل كلمات البحث',
+                noData: 'لا توجد بيانات',
+                noDataDesc: 'يرجى التحقق من مصدر البيانات',
+                errorTitle: 'فشل الاتصال',
+                errorDesc: 'تعذر جلب البيانات. يرجى المحاولة مرة أخرى.',
+                retryButton: 'إعادة المحاولة',
+                totalPrice: 'السعر الإجمالي',
+                unitPrice: 'سعر الوحدة',
             }
+        };
 
-            // Search Listener
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                renderList(e.target.value.trim().toLowerCase());
-            });
-        });
+        function t(key) {
+            return translations[state.currentLang][key] || key;
+        }
 
-        // ==========================================
-        // Data Fetching
-        // ==========================================
-        async function fetchDrugs() {
+        // =====================================================
+        // DOM ELEMENTS
+        // =====================================================
+        const elements = {
+            searchInput: document.getElementById('searchInput'),
+            clearSearch: document.getElementById('clearSearch'),
+            drugsContainer: document.getElementById('drugsContainer'),
+            statsBar: document.getElementById('statsBar'),
+            totalCount: document.getElementById('totalCount'),
+            totalLabel: document.getElementById('totalLabel'),
+            filteredCount: document.getElementById('filteredCount'),
+            filteredLabel: document.getElementById('filteredLabel'),
+            filteredStat: document.getElementById('filteredStat'),
+            brandTitle: document.getElementById('brandTitle'),
+            brandSubtitle: document.getElementById('brandSubtitle'),
+        };
+
+        // =====================================================
+        // UTILITY FUNCTIONS
+        // =====================================================
+        function formatPrice(num) {
+            const parsed = parseFloat(num);
+            if (isNaN(parsed)) return '0';
+            return parsed.toLocaleString('en-US');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function normalizeDrug(drug) {
+            return {
+                name: drug.drugName || drug['Drug Name'] || drug.name || 'Unknown',
+                dosage: drug.dosageForm || drug['Dosage Form'] || drug.form || 'N/A',
+                total: drug.totalPrice || drug['Total Price'] || drug.total || 0,
+                unit: drug.unitPrice || drug['Unit Price'] || drug.unit || 0,
+            };
+        }
+
+        // =====================================================
+        // CACHE FUNCTIONS
+        // =====================================================
+        function getCachedData() {
             try {
-                const res = await fetch(APPS_SCRIPT_URL);
-                const data = await res.json();
-                drugsData = data;
-                renderList();
-            } catch (err) {
-                document.getElementById('app').innerHTML = '<div class="status-msg">خطأ في الاتصال</div>';
+                const cached = localStorage.getItem(CONFIG.CACHE_KEY);
+                if (!cached) return null;
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp > CONFIG.CACHE_DURATION) return null;
+                return data;
+            } catch {
+                return null;
             }
         }
 
-        function loadDemoData() {
-            drugsData = [
-                { Drug_Name: 'باراسيتامول', Unit_Price: 250 },
-                { Drug_Name: 'أموكسيسيلين', Unit_Price: 500 },
-                { Drug_Name: 'ميروبينيم', Unit_Price: 15000 },
-                { Drug_Name: 'فانكومايسين', Unit_Price: 12000 },
-                { Drug_Name: 'سيبروفلوكساسين', Unit_Price: 750 },
-                { Drug_Name: 'أوميبرازول', Unit_Price: 980 },
-                { Drug_Name: 'سيفترياكسون', Unit_Price: 850 }
-            ];
-            renderList();
+        function setCachedData(data) {
+            try {
+                localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({
+                    data,
+                    timestamp: Date.now(),
+                }));
+            } catch {
+                // Cache failed, continue without caching
+            }
         }
 
-        // ==========================================
-        // Rendering
-        // ==========================================
-        function renderList(filter = '') {
-            const filtered = drugsData.filter(d => d.Drug_Name.toLowerCase().includes(filter));
-            
-            if (filtered.length === 0) {
-                document.getElementById('app').innerHTML = '<div class="status-msg">لا توجد نتائج</div>';
+        // =====================================================
+        // API FUNCTIONS
+        // =====================================================
+        async function fetchDrugs() {
+            if (state.isLoading) return;
+            state.isLoading = true;
+            renderLoading();
+
+            try {
+                // Check cache first
+                const cached = getCachedData();
+                if (cached && cached.length > 0) {
+                    state.allDrugs = cached.map(normalizeDrug);
+                    state.filteredDrugs = [...state.allDrugs];
+                    renderDrugs();
+                    return;
+                }
+
+                // Validate API URL
+                if (!CONFIG.API_URL || CONFIG.API_URL === 'https://script.google.com/macros/s/AKfycbxs1lDubMHa0rY0c-4KiMhJr4T0rpS8nNjSjznPdSvgofmZXAhKcxKlGdxMZ3-tLpyY/exec') {
+                    throw new Error('API URL not configured');
+                }
+
+                const response = await fetch(CONFIG.API_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                let drugs = Array.isArray(data) ? data : (data.data || data.records || []);
+
+                if (drugs.length === 0) throw new Error('No data received');
+
+                state.allDrugs = drugs.map(normalizeDrug);
+                state.filteredDrugs = [...state.allDrugs];
+                setCachedData(drugs);
+                renderDrugs();
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                renderError();
+            } finally {
+                state.isLoading = false;
+            }
+        }
+
+        // =====================================================
+        // RENDER FUNCTIONS
+        // =====================================================
+        function renderLoading() {
+            elements.drugsContainer.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">${t('loading')}</p>
+                    <p class="loading-subtext">${t('loadingSub')}</p>
+                </div>
+            `;
+        }
+
+        function renderDrugs() {
+            const drugs = state.filteredDrugs;
+
+            if (drugs.length === 0) {
+                renderEmpty(!!state.searchQuery);
                 return;
             }
 
-            // 1. Desktop Table HTML
-            let tableHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم الدواء</th>
-                            <th style="text-align: left;">السعر (دينار)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            const cardsHtml = drugs.map((drug, index) => `
+                <article class="drug-card" data-index="${index}">
+                    <div class="drug-header">
+                        <h3 class="drug-name">${escapeHtml(drug.name)}</h3>
+                        <div class="dosage-tag">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.5 20H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H20a2 2 0 0 1 2 2v3"/>
+                                <circle cx="18" cy="18" r="3"/>
+                                <path d="M18 14v8M14 18h8"/>
+                            </svg>
+                            ${escapeHtml(drug.dosage)}
+                        </div>
+                    </div>
+                    <div class="price-grid">
+                        <div class="price-box total">
+                            <div class="price-label">${t('totalPrice')}</div>
+                            <div class="price-value">${formatPrice(drug.total)}<span class="price-currency">IQD</span></div>
+                        </div>
+                        <div class="price-box">
+                            <div class="price-label">${t('unitPrice')}</div>
+                            <div class="price-value">${formatPrice(drug.unit)}<span class="price-currency">IQD</span></div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            elements.drugsContainer.innerHTML = cardsHtml;
+            updateStats();
+
+            // Staggered reveal animation
+            requestAnimationFrame(() => {
+                const cards = elements.drugsContainer.querySelectorAll('.drug-card');
+                cards.forEach((card, i) => {
+                    setTimeout(() => card.classList.add('visible'), i * CONFIG.ANIMATION_DELAY);
+                });
+            });
+        }
+
+        function renderEmpty(isSearchResult = false) {
+            const title = isSearchResult ? t('noResults') : t('noData');
+            const desc = isSearchResult ? t('noResultsDesc') : t('noDataDesc');
+
+            elements.drugsContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">${title}</h3>
+                    <p class="empty-desc">${desc}</p>
+                </div>
             `;
 
-            // 2. Mobile Cards HTML
-            let cardsHTML = '';
-
-            filtered.forEach(drug => {
-                // English formatted number
-                const priceFormatted = drug.Unit_Price.toLocaleString('en-US');
-
-                // Desktop Row
-                tableHTML += `
-                    <tr>
-                        <td style="font-weight: 500;">${drug.Drug_Name}</td>
-                        <td class="price-col">${priceFormatted}</td>
-                    </tr>
-                `;
-
-                // Mobile Card
-                cardsHTML += `
-                    <div class="card-item">
-                        <span class="name">${drug.Drug_Name}</span>
-                        <span class="price">${priceFormatted}</span>
-                    </div>
-                `;
-            });
-
-            tableHTML += '</tbody></table>';
-
-            // Combine both (CSS handles visibility)
-            document.getElementById('app').innerHTML = tableHTML + cardsHTML;
+            updateStats();
         }
-    </script>
 
+        function renderError() {
+            elements.drugsContainer.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <h3 class="error-title">${t('errorTitle')}</h3>
+                    <p class="error-desc">${t('errorDesc')}</p>
+                    <button class="retry-button" onclick="retryFetch()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M1 4v6h6"/>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                        </svg>
+                        ${t('retryButton')}
+                    </button>
+                </div>
+            `;
+
+            elements.statsBar.style.display = 'none';
+        }
+
+        function updateStats() {
+            elements.statsBar.style.display = 'flex';
+            elements.totalCount.textContent = state.allDrugs.length;
+            elements.totalLabel.textContent = t('totalDrugs');
+
+            if (state.searchQuery && state.filteredDrugs.length !== state.allDrugs.length) {
+                elements.filteredStat.style.display = 'flex';
+                elements.filteredCount.textContent = state.filteredDrugs.length;
+                elements.filteredLabel.textContent = t('matching');
+            } else {
+                elements.filteredStat.style.display = 'none';
+            }
+        }
+
+        // =====================================================
+        // SEARCH FUNCTIONS
+        // =====================================================
+        function handleSearch(query) {
+            state.searchQuery = query.toLowerCase().trim();
+            elements.clearSearch.classList.toggle('visible', query.length > 0);
+
+            if (!state.searchQuery) {
+                state.filteredDrugs = [...state.allDrugs];
+            } else {
+                state.filteredDrugs = state.allDrugs.filter(drug => 
+                    drug.name.toLowerCase().includes(state.searchQuery) ||
+                    drug.dosage.toLowerCase().includes(state.searchQuery)
+                );
+            }
+
+            renderDrugs();
+        }
+
+        const debouncedSearch = debounce(handleSearch, CONFIG.SEARCH_DEBOUNCE);
+
+        // =====================================================
+        // LANGUAGE TOGGLE
+        // =====================================================
+        function toggleLanguage() {
+            state.currentLang = state.currentLang === 'en' ? 'ar' : 'en';
+            document.documentElement.dir = state.currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = state.currentLang;
+
+            // Update static text
+            elements.brandTitle.textContent = t('brandTitle');
+            elements.brandSubtitle.textContent = t('brandSubtitle');
+            elements.searchInput.placeholder = t('searchPlaceholder');
+
+            // Re-render if we have drugs
+            if (state.allDrugs.length > 0) {
+                renderDrugs();
+            } else if (elements.drugsContainer.querySelector('.error-state')) {
+                renderError();
+            } else if (elements.drugsContainer.querySelector('.empty-state')) {
+                renderEmpty(!!state.searchQuery);
+            } else if (elements.drugsContainer.querySelector('.loading-container')) {
+                renderLoading();
+            }
+        }
+
+        // =====================================================
+        // RETRY FUNCTION
+        // =====================================================
+        function retryFetch() {
+            // Clear cache on retry
+            localStorage.removeItem(CONFIG.CACHE_KEY);
+            fetchDrugs();
+        }
+
+        // =====================================================
+        // DEMO DATA (For testing without API)
+        // =====================================================
+        function loadDemoData() {
+            const demoDrugs = [
+                { drugName: 'Amoxicillin 500mg', dosageForm: 'Capsule', totalPrice: 15000, unitPrice: 1500 },
+                { drugName: 'Paracetamol 500mg', dosageForm: 'Tablet', totalPrice: 8500, unitPrice: 425 },
+                { drugName: 'Ceftriaxone 1g Injection', dosageForm: 'Injection', totalPrice: 48000, unitPrice: 48000 },
+                { drugName: 'Ibuprofen 400mg', dosageForm: 'Tablet', totalPrice: 12000, unitPrice: 600 },
+                { drugName: 'Omeprazole 20mg', dosageForm: 'Capsule', totalPrice: 28000, unitPrice: 2800 },
+                { drugName: 'Metformin 500mg', dosageForm: 'Tablet', totalPrice: 18500, unitPrice: 462 },
+                { drugName: 'Atorvastatin 20mg', dosageForm: 'Tablet', totalPrice: 38000, unitPrice: 3800 },
+                { drugName: 'Salbutamol Inhaler 100mcg', dosageForm: 'Inhaler', totalPrice: 65000, unitPrice: 65000 },
+                { drugName: 'Ciprofloxacin 500mg', dosageForm: 'Tablet', totalPrice: 24000, unitPrice: 1200 },
+                { drugName: 'Azithromycin 500mg', dosageForm: 'Tablet', totalPrice: 35000, unitPrice: 3500 },
+                { drugName: 'Insulin Glargine 100U/ml', dosageForm: 'Injection', totalPrice: 145000, unitPrice: 145000 },
+                { drugName: 'Losartan Potassium 50mg', dosageForm: 'Tablet', totalPrice: 32000, unitPrice: 1600 },
+                { drugName: 'Vitamin D3 50000 IU', dosageForm: 'Capsule', totalPrice: 18000, unitPrice: 6000 },
+                { drugName: 'Prednisolone Syrup 5mg/5ml', dosageForm: 'Syrup', totalPrice: 14000, unitPrice: 14000 },
+                { drugName: 'Cetirizine 10mg', dosageForm: 'Tablet', totalPrice: 9500, unitPrice: 950 },
+                { drugName: 'Pantoprazole 40mg', dosageForm: 'Injection', totalPrice: 28000, unitPrice: 28000 },
+                { drugName: 'Dexamethasone 8mg', dosageForm: 'Injection', totalPrice: 15000, unitPrice: 15000 },
+                { drugName: 'Montelukast 10mg', dosageForm: 'Tablet', totalPrice: 22000, unitPrice: 2200 },
+                { drugName: 'Ambroxol Syrup 30mg/5ml', dosageForm: 'Syrup', totalPrice: 11000, unitPrice: 11000 },
+                { drugName: 'Clopidogrel 75mg', dosageForm: 'Tablet', totalPrice: 42000, unitPrice: 4200 },
+            ];
+
+            state.allDrugs = demoDrugs.map(normalizeDrug);
+            state.filteredDrugs = [...state.allDrugs];
+            setCachedData(demoDrugs);
+            renderDrugs();
+        }
+
+        // =====================================================
+        // EVENT LISTENERS
+        // =====================================================
+        elements.searchInput.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+        });
+
+        elements.clearSearch.addEventListener('click', () => {
+            elements.searchInput.value = '';
+            handleSearch('');
+            elements.searchInput.focus();
+        });
+
+        elements.searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                elements.searchInput.value = '';
+                handleSearch('');
+            }
+        });
+
+        // =====================================================
+        // INITIALIZATION
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if API URL is configured
+            if (CONFIG.API_URL && CONFIG.API_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
+                fetchDrugs().catch(() => loadDemoData());
+            } else {
+                // Load demo data for testing
+                console.info('API URL not configured. Loading demo data for preview.');
+                setTimeout(loadDemoData, 500);
+            }
+        });
+    </script>
 </body>
 </html>
