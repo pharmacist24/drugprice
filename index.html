@@ -220,6 +220,31 @@
 
         [dir="rtl"] .search-clear {
             right: auto;
+            left: 0%);
+        }
+
+        .search-input:focus ~ .search-icon {
+            color: var(--accent-primary);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        [dir="rtl"] .search-clear {
+            right: auto;
             left: 14px;
         }
 
@@ -239,6 +264,86 @@
             margin: 0 auto;
             padding: 24px 20px 100px;
         }
+
+        /* ============================================
+           INFINITY CAROUSEL (TICKER)
+           ============================================ */
+        .ticker-section {
+            margin-bottom: 20px;
+        }
+
+        .ticker-wrapper {
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            position: relative;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Gradient Fades on edges */
+        .ticker-wrapper::before, .ticker-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .ticker-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, var(--bg-card), transparent);
+        }
+        .ticker-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, var(--bg-card), transparent);
+        }
+
+        .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: tickerScroll 25s linear infinite;
+        }
+
+        /* RTL Support for Animation */
+        [dir="rtl"] .ticker-track {
+            animation-name: tickerScrollRTL;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 3rem; /* Spacing between repeats */
+            white-space: nowrap;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ticker-icon {
+            color: var(--accent-primary);
+            flex-shrink: 0;
+        }
+
+        /* The Infinite Loop Animation */
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Move exactly 50% (since we duplicated content) */
+        }
+
+        @keyframes tickerScrollRTL {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); } /* Move opposite for RTL */
+        }
+
+        /* Pause on hover */
+        .ticker-wrapper:hover .ticker-track {
+            animation-play-state: paused;
+        }
+
 
         /* Stats Bar */
         .stats-bar {
@@ -556,7 +661,8 @@
             .atmosphere::before,
             .atmosphere::after,
             .loading-spinner,
-            .drug-card {
+            .drug-card,
+            .ticker-track {
                 animation: none;
             }
             .drug-card {
@@ -659,6 +765,16 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        
+        <!-- INFINITY CAROUSEL TICKER -->
+        <div class="ticker-section">
+            <div class="ticker-wrapper">
+                <div class="ticker-track" id="tickerTrack">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Bar -->
         <div class="stats-bar" id="statsBar" style="display: none;">
             <div class="stat-chip">
@@ -684,7 +800,7 @@
         // =====================================================
         const CONFIG = {
             // Replace with your Google Apps Script Web App URL
-            API_URL: 'https://script.google.com/macros/s/AKfycbyw4PYm1ZMghqMN6rTMcLIq2I5rC-J3JIh_yf_PE7_bSuV4KdYC5SwGHRk9pTvTF5rT/exec',
+            API_URL: 'https://script.google.com/macros/s/AKfycbydN-_OZWgNhkngoC6zoqNcbMZgXQKOYun721wJyF0YxMHeFSJESDRjqz_XPUjMYKOR/exec',
             CACHE_KEY: 'pharmacy_drugs_cache',
             CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
             SEARCH_DEBOUNCE: 200,
@@ -723,6 +839,7 @@
                 retryButton: 'Try Again',
                 totalPrice: 'Total Price',
                 unitPrice: 'Unit Price',
+                defaultTicker: 'Welcome to the Pharmacy Pricing System • Prices are updated regularly',
             },
             ar: {
                 brandTitle: 'أسعار الأدوية',
@@ -741,6 +858,7 @@
                 retryButton: 'إعادة المحاولة',
                 totalPrice: 'السعر الإجمالي',
                 unitPrice: 'سعر الوحدة',
+                defaultTicker: 'مرحباً بكم في نظام أسعار الأدوية • يتم تحديث الأسعار بانتظام',
             }
         };
 
@@ -763,6 +881,7 @@
             filteredStat: document.getElementById('filteredStat'),
             brandTitle: document.getElementById('brandTitle'),
             brandSubtitle: document.getElementById('brandSubtitle'),
+            tickerTrack: document.getElementById('tickerTrack'),
         };
 
         // =====================================================
@@ -802,6 +921,35 @@
         }
 
         // =====================================================
+        // TICKER CONTROL
+        // =====================================================
+        function updateTicker(message) {
+            const track = elements.tickerTrack;
+            if (!message) message = t('defaultTicker');
+            
+            // We duplicate the item to create the seamless infinite loop
+            const tickerHTML = `
+                <div class="ticker-item">
+                    <svg class="ticker-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                    <span>${escapeHtml(message)}</span>
+                </div>
+                <div class="ticker-item">
+                     <svg class="ticker-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                    <span>${escapeHtml(message)}</span>
+                </div>
+            `;
+            track.innerHTML = tickerHTML;
+        }
+
+        // =====================================================
         // CACHE FUNCTIONS
         // =====================================================
         function getCachedData() {
@@ -834,19 +982,21 @@
             if (state.isLoading) return;
             state.isLoading = true;
             renderLoading();
+            updateTicker(t('loading'));
 
             try {
                 // Check cache first
                 const cached = getCachedData();
-                if (cached && cached.length > 0) {
-                    state.allDrugs = cached.map(normalizeDrug);
+                if (cached && cached.drugs && cached.drugs.length > 0) {
+                    state.allDrugs = cached.drugs.map(normalizeDrug);
                     state.filteredDrugs = [...state.allDrugs];
+                    updateTicker(cached.ticker); // Restore ticker from cache
                     renderDrugs();
                     return;
                 }
 
                 // Validate API URL
-                if (!CONFIG.API_URL || CONFIG.API_URL === 'https://script.google.com/macros/s/AKfycbxs1lDubMHa0rY0c-4KiMhJr4T0rpS8nNjSjznPdSvgofmZXAhKcxKlGdxMZ3-tLpyY/exec') {
+                if (!CONFIG.API_URL || CONFIG.API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
                     throw new Error('API URL not configured');
                 }
 
@@ -855,12 +1005,19 @@
 
                 const data = await response.json();
                 let drugs = Array.isArray(data) ? data : (data.data || data.records || []);
+                
+                // Check for specific ticker field from API
+                const tickerMsg = data.ticker || data.message || data.statusMessage || null;
 
                 if (drugs.length === 0) throw new Error('No data received');
 
                 state.allDrugs = drugs.map(normalizeDrug);
                 state.filteredDrugs = [...state.allDrugs];
-                setCachedData(drugs);
+                
+                // Save to cache
+                setCachedData({ drugs, ticker: tickerMsg });
+                
+                updateTicker(tickerMsg);
                 renderDrugs();
 
             } catch (error) {
@@ -972,6 +1129,7 @@
             `;
 
             elements.statsBar.style.display = 'none';
+            updateTicker(t('errorTitle')); // Update ticker on error
         }
 
         function updateStats() {
@@ -1032,6 +1190,12 @@
             } else if (elements.drugsContainer.querySelector('.loading-container')) {
                 renderLoading();
             }
+
+            // If no specific ticker message from API, update default based on language
+            const cached = getCachedData();
+            if (!cached || !cached.ticker) {
+                updateTicker(t('defaultTicker'));
+            }
         }
 
         // =====================================================
@@ -1072,7 +1236,12 @@
 
             state.allDrugs = demoDrugs.map(normalizeDrug);
             state.filteredDrugs = [...state.allDrugs];
-            setCachedData(demoDrugs);
+            
+            // Demo Ticker Message
+            const demoTicker = "System Update: New pricing list effective from October 1st | تحديث النظام: قائمة أسعار جديدة سارية من 1 أكتوبر";
+            updateTicker(demoTicker);
+            
+            setCachedData({ drugs: demoDrugs, ticker: demoTicker });
             renderDrugs();
         }
 
@@ -1100,6 +1269,9 @@
         // INITIALIZATION
         // =====================================================
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Ticker
+            updateTicker(t('defaultTicker'));
+
             // Check if API URL is configured
             if (CONFIG.API_URL && CONFIG.API_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL') {
                 fetchDrugs().catch(() => loadDemoData());
